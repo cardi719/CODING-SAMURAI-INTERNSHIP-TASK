@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster - Complete To-Do App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS will be placed here */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+        
+        .header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .theme-selector {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .theme-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+        }
+        
+        .theme-light {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        .theme-dark {
+            background: linear-gradient(135deg, #232526 0%, #414345 100%);
+        }
+        
+        .theme-blue {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        }
+        
+        .theme-green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .sidebar {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .calendar {
+            margin-bottom: 30px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .calendar-cell {
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .calendar-cell.today {
+            background-color: #6a11cb;
+            color: white;
+        }
+        
+        .mood-tracker {
+            margin-top: 30px;
+        }
+        
+        .mood-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .mood-option {
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        
+        .mood-option.active {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+        
+        .main-content {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .task-form {
+            display: grid;
+            grid-template-columns: 1fr 150px 120px 100px;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .task-input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background-color: #6a11cb;
+            color: white;
+        }
+        
+        .task-list {
+            list-style-type: none;
+        }
+        
+        .task-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto auto;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-item.completed {
+            opacity: 0.7;
+            background-color: #f9f9f9;
+        }
+        
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+        }
+        
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .task-text {
+            font-size: 16px;
+        }
+        
+        .task-reminder {
+            font-size: 14px;
+            color: #6a11cb;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .task-mood {
+            font-size: 20px;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #777;
+        }
+        
+        .action-btn:hover {
+            color: #6a11cb;
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: none;
+            cursor: pointer;
+        }
+        
+        .filter-btn.active {
+            background-color: #6a11cb;
+            color: white;
+            border-color: #6a11cb;
+        }
+        
+        /* Dark theme */
+        body.dark-theme {
+            background-color: #232323;
+            color: #f5f5f5;
+        }
+        
+        body.dark-theme .sidebar,
+        body.dark-theme .main-content {
+            background-color: #2d2d2d;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.dark-theme .task-input {
+            background-color: #3d3d3d;
+            color: #f5f5f5;
+            border-color: #444;
+        }
+        
+        body.dark-theme .task-item {
+            border-color: #444;
+        }
+        
+        body.dark-theme .task-item.completed {
+            background-color: #353535;
+        }
+        
+        body.dark-theme .filter-btn {
+            border-color: #555;
+            color: #f5f5f5;
+        }
+        
+        /* Blue theme */
+        body.blue-theme {
+            background-color: #e6f0ff;
+            color: #2c3e50;
+        }
+        
+        /* Green theme */
+        body.green-theme {
+            background-color: #f0fff4;
+            color: #2c3e50;
+        }
+        
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .task-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // JavaScript (React) code will be placed here
+        const { useState, useEffect } = React;
+
+        const TodoApp = () => {
+            const [tasks, setTasks] = useState([]);
+            const [newTask, setNewTask] = useState('');
+            const [reminderTime, setReminderTime] = useState('');
+            const [selectedMood, setSelectedMood] = useState('😊');
+            const [filter, setFilter] = useState('all');
+            const [theme, setTheme] = useState('light');
+            const [currentDate, setCurrentDate] = useState(new Date());
+            
+            
+            useEffect(() => {
+                const sampleTasks = [
+                    { id: 1, text: 'Complete React project', completed: false, reminder: '2023-08-15T10:30', mood: '😊' },
+                    { id: 2, text: 'Buy groceries', completed: true, reminder: '', mood: '😐' },
+                    { id: 3, text: 'Call mom', completed: false, reminder: '2023-08-20T15:00', mood: '😊' },
+                    { id: 4, text: 'Prepare presentation', completed: false, reminder: '', mood: '😅' }
+                ];
+                setTasks(sampleTasks);
+            }, []);
+            
+          
+            useEffect(() => {
+                document.body.className = `${theme}-theme`;
+            }, [theme]);
+            
+            const addTask = () => {
+                if (newTask.trim() === '') return;
+                
+                const task = {
+                    id: Date.now(),
+                    text: newTask,
+                    completed: false,
+                    reminder: reminderTime,
+                    mood: selectedMood
+                };
+                
+                setTasks([...tasks, task]);
+                setNewTask('');
+                setReminderTime('');
+                setSelectedMood('😊');
+            };
+            
+            const deleteTask = (taskId) => {
+                setTasks(tasks.filter(task => task.id !== taskId));
+            };
+            
+            const toggleComplete = (taskId) => {
+                setTasks(tasks.map(task => 
+                    task.id === taskId ? { ...task, completed: !task.completed } : task
+                ));
+            };
+            
+            const filteredTasks = tasks.filter(task => {
+                if (filter === 'active') return !task.completed;
+                if (filter === 'completed') return task.completed;
+                return true;
+            });
+            
+            const changeTheme = (newTheme) => {
+                setTheme(newTheme);
+            };
+            
+            const formatDate = (date) => {
+                return date.toISOString().slice(0, 10);
+            };
+            
+            const getDaysInMonth = (date) => {
+                const year = date.getFullYear();
+                const month = date.getMonth();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const firstDay = new Date(year, month, 1).getDay();
+                
+                const days = [];
+                
+                // Add empty cells for days before the first day of the month
+                for (let i = 0; i < firstDay; i++) {
+                    days.push(null);
+                }
+                
+                // Add days of the month
+                for (let i = 1; i <= daysInMonth; i++) {
+                    days.push(new Date(year, month, i));
+                }
+                
+                return days;
+            };
+            
+            const days = getDaysInMonth(currentDate);
+            
+            const navigateMonth = (direction) => {
+                setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + direction, 1));
+            };
+            
+            return (
+                <div className="app-container">
+                    <header className="header">
+                        <h1><i className="fas fa-tasks"></i> TaskMaster</h1>
+                        <div className="theme-selector">
+                            <div className="theme-btn theme-light" onClick={() => changeTheme('light')} title="Light Theme"></div>
+                            <div className="theme-btn theme-dark" onClick={() => changeTheme('dark')} title="Dark Theme"></div>
+                            <div className="theme-btn theme-blue" onClick={() => changeTheme('blue')} title="Blue Theme"></div>
+                            <div className="theme-btn theme-green" onClick={() => changeTheme('green')} title="Green Theme"></div>
+                        </div>
+                    </header>
+                    
+                    <aside className="sidebar">
+                        <div className="calendar">
+                            <div className="calendar-header">
+                                <button onClick={() => navigateMonth(-1)}><i className="fas fa-chevron-left"></i></button>
+                                <h3>{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</h3>
+                                <button onClick={() => navigateMonth(1)}><i className="fas fa-chevron-right"></i></button>
+                            </div>
+                            <div className="calendar-grid">
+                                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                                    <div key={day} style={{ textAlign: 'center', fontWeight: 'bold' }}>{day}</div>
+                                ))}
+                                {days.map((day, index) => (
+                                    <div 
+                                        key={index} 
+                                        className={`calendar-cell ${day && formatDate(day) === formatDate(new Date()) ? 'today' : ''}`}
+                                    >
+                                        {day ? day.getDate() : ''}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        <div className="mood-tracker">
+                            <h3>How are you feeling today?</h3>
+                            <div className="mood-options">
+                                {['😊', '😐', '😅', '😢', '😡'].map(mood => (
+                                    <span 
+                                        key={mood}
+                                        className={`mood-option ${selectedMood === mood ? 'active' : ''}`}
+                                        onClick={() => setSelectedMood(mood)}
+                                    >
+                                        {mood}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </aside>
+                    
+                    <main className="main-content">
+                        <div className="task-form">
+                            <input
+                                type="text"
+                                className="task-input"
+                                placeholder="Add a new task..."
+                                value={newTask}
+                                onChange={(e) => setNewTask(e.target.value)}
+                            />
+                            <input
+                                type="datetime-local"
+                                className="task-input"
+                                value={reminderTime}
+                                onChange={(e) => setReminderTime(e.target.value)}
+                            />
+                            <select 
+                                className="task-input"
+                                value={selectedMood}
+                                onChange={(e) => setSelectedMood(e.target.value)}
+                            >
+                                <option value="😊">Happy</option>
+                                <option value="😐">Neutral</option>
+                                <option value="😅">Stressed</option>
+                                <option value="😢">Sad</option>
+                                <option value="😡">Angry</option>
+                            </select>
+                            <button className="btn btn-primary" onClick={addTask}>
+                                <i className="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                        
+                        <div className="filter-options">
+                            <button 
+                                className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
+                                onClick={() => setFilter('all')}
+                            >
+                                All Tasks
+                            </button>
+                            <button 
+                                className={`filter-btn ${filter === 'active' ? 'active' : ''}`}
+                                onClick={() => setFilter('active')}
+                            >
+                                Active
+                            </button>
+                            <button 
+                                className={`filter-btn ${filter === 'completed' ? 'active' : ''}`}
+                                onClick={() => setFilter('completed')}
+                            >
+                                Completed
+                            </button>
+                        </div>
+                        
+                        <ul className="task-list">
+                            {filteredTasks.map(task => (
+                                <li key={task.id} className={`task-item ${task.completed ? 'completed' : ''}`}>
+                                    <input
+                                        type="checkbox"
+                                        className="task-checkbox"
+                                        checked={task.completed}
+                                        onChange={() => toggleComplete(task.id)}
+                                    />
+                                    <span className="task-text">{task.text}</span>
+                                    {task.reminder && (
+                                        <span className="task-reminder">
+                                            <i className="far fa-bell"></i> 
+                                            {new Date(task.reminder).toLocaleString()}
+                                        </span>
+                                    )}
+                                    <span className="task-mood">{task.mood}</span>
+                                    <div className="task-actions">
+                                        <button className="action-btn" onClick={() => deleteTask(task.id)}>
+                                            <i className="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </main>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<TodoApp />);
+    </script>
+</body>
+</html>
